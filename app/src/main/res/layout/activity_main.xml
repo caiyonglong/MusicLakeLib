@@ -7,6 +7,7 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/titleTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!"
@@ -16,35 +17,44 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/prevBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="上一首"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button3"
+        app:layout_constraintEnd_toStartOf="@+id/playPauseBtn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.71" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/initBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="播放歌曲"
+        app:layout_constraintBottom_toTopOf="@+id/playPauseBtn"
+        app:layout_constraintEnd_toEndOf="@+id/playPauseBtn"
+        app:layout_constraintStart_toStartOf="@+id/playPauseBtn" />
+
+    <Button
+        android:id="@+id/nextBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="下一首"
-        app:layout_constraintBottom_toBottomOf="@+id/button"
+        app:layout_constraintBottom_toBottomOf="@+id/prevBtn"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button3"
-        app:layout_constraintTop_toTopOf="@+id/button"
+        app:layout_constraintStart_toEndOf="@+id/playPauseBtn"
+        app:layout_constraintTop_toTopOf="@+id/prevBtn"
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/playPauseBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="播放/暂停"
-        app:layout_constraintBottom_toBottomOf="@+id/button2"
-        app:layout_constraintEnd_toStartOf="@+id/button2"
-        app:layout_constraintStart_toEndOf="@+id/button"
-        app:layout_constraintTop_toTopOf="@+id/button2" />
+        app:layout_constraintBottom_toBottomOf="@+id/nextBtn"
+        app:layout_constraintEnd_toStartOf="@+id/nextBtn"
+        app:layout_constraintStart_toEndOf="@+id/prevBtn"
+        app:layout_constraintTop_toTopOf="@+id/nextBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

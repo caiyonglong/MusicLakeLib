@@ -57,7 +57,7 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
                 listener.onPlayerStateChanged(false);
             }
             boolean cacheSetting = MusicPlayerManager.getInstance().isHasCache();
-            LogUtil.d(TAG, "缓存设置：" + cacheSetting);
+            LogUtil.d(TAG, "缓存设置：" + cacheSetting + " path =" + path);
             //本地歌曲无需缓存
             if (path.startsWith("content://") || path.startsWith("/storage")) {
                 mCurrentMediaPlayer.setDataSource(context, Uri.parse(path));

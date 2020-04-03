@@ -648,7 +648,13 @@ public class MusicPlayerService extends Service implements MusicPlayerController
             //更新当前歌曲
             isMusicPlaying = false;
             //检查歌曲播放地址或者专辑
-            checkPlayOnValid();
+            if (musicUrlRequest != null) {
+                checkPlayOnValid();
+            } else {
+                playErrorTimes = 0;
+                mPlayer.playWhenReady = playWhenReady;
+                mPlayer.setDataSource(mNowPlayingMusic.getUri());
+            }
             notifyChange(META_CHANGED);
             //更新播放播放状态
             notifyChange(PLAY_STATE_CHANGED);
@@ -669,32 +675,33 @@ public class MusicPlayerService extends Service implements MusicPlayerController
         }
     }
 
+    /**
+     * 检查歌曲播放地址是否正常
+     */
     private void checkPlayOnValid() {
-        if (musicUrlRequest != null) {
-            musicUrlRequest.checkNonValid(mNowPlayingMusic, new MusicRequestCallBack() {
-                @Override
-                public void onMusicBitmap(@NotNull Bitmap bitmap) {
-                    coverBitmap = bitmap;
-                    notifyManager.updateNotification(isMusicPlaying, true, bitmap);
-                }
+        musicUrlRequest.checkNonValid(mNowPlayingMusic, new MusicRequestCallBack() {
+            @Override
+            public void onMusicBitmap(@NotNull Bitmap bitmap) {
+                coverBitmap = bitmap;
+                notifyManager.updateNotification(isMusicPlaying, true, bitmap);
+            }
 
-                @Override
-                public void onMusicValid(@NotNull String url) {
-                    LogUtil.e(TAG, "checkNonValid-----" + url);
-                    mNowPlayingMusic.setUri(url);
-                    playErrorTimes = 0;
-                    mPlayer.playWhenReady = playWhenReady;
-                    mPlayer.setDataSource(url);
-                }
+            @Override
+            public void onMusicValid(@NotNull String url) {
+                LogUtil.e(TAG, "checkNonValid-----" + url);
+                mNowPlayingMusic.setUri(url);
+                playErrorTimes = 0;
+                mPlayer.playWhenReady = playWhenReady;
+                mPlayer.setDataSource(url);
+            }
 
-                @Override
-                public void onActionDirect() {
-                    playErrorTimes = 0;
-                    mPlayer.playWhenReady = playWhenReady;
-                    mPlayer.setDataSource(mNowPlayingMusic.getUri());
-                }
-            });
-        }
+            @Override
+            public void onActionDirect() {
+                playErrorTimes = 0;
+                mPlayer.playWhenReady = playWhenReady;
+                mPlayer.setDataSource(mNowPlayingMusic.getUri());
+            }
+        });
     }
 
     /**

@@ -24,7 +24,6 @@ import java.util.List;
  * Triple press: previous track
  * Long press: voice search
  */
-
 public class MediaButtonIntentReceiver extends BroadcastReceiver {
     private static final boolean DEBUG = true;
     private static final String TAG = "ButtonIntentReceiver";
