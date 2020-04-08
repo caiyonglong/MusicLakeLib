@@ -8,7 +8,7 @@ import android.os.PowerManager;
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.music.lake.musiclib.MusicPlayerManager;
 import com.music.lake.musiclib.bean.BaseMusicInfo;
-import com.music.lake.musiclib.utils.LogUtil;
+import com.music.lake.musiclib.utils.MusicLibLog;
 
 
 /**
@@ -56,8 +56,8 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
             if (listener != null) {
                 listener.onPlayerStateChanged(false);
             }
-            boolean cacheSetting = MusicPlayerManager.getInstance().isHasCache();
-            LogUtil.d(TAG, "缓存设置：" + cacheSetting + " path =" + path);
+            boolean cacheSetting = MusicPlayerManager.Companion.getInstance().isHasCache();
+            MusicLibLog.d(TAG, "缓存设置：" + cacheSetting + " path =" + path);
             //本地歌曲无需缓存
             if (path.startsWith("content://") || path.startsWith("/storage")) {
                 mCurrentMediaPlayer.setDataSource(context, Uri.parse(path));
@@ -65,19 +65,19 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
                 //缓存开启，读取缓存
                 HttpProxyCacheServer proxy = MusicPlayerManager.getProxy();
                 String proxyUrl = proxy.getProxyUrl(path);
-                LogUtil.d(TAG, "设置缓存,缓存地址：proxyUrl=" + proxyUrl);
+                MusicLibLog.d(TAG, "设置缓存,缓存地址：proxyUrl=" + proxyUrl);
                 mCurrentMediaPlayer.setDataSource(proxyUrl);
             } else {
                 //不缓存
                 mCurrentMediaPlayer.setDataSource(path);
             }
-            LogUtil.d(TAG, "prepareAsync");
+            MusicLibLog.d(TAG, "prepareAsync");
             mCurrentMediaPlayer.prepareAsync();
             if (listener != null) {
                 listener.onLoading(true);
             }
         } catch (Exception todo) {
-            LogUtil.e(TAG, "Exception:" + todo.getMessage());
+            MusicLibLog.e(TAG, "Exception:" + todo.getMessage());
             todo.printStackTrace();
             return false;
         }
@@ -98,7 +98,7 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
     @Override
     public void start() {
         super.start();
-        LogUtil.d(TAG, "start");
+        MusicLibLog.d(TAG, "start");
         mCurrentMediaPlayer.start();
         if (listener != null) {
             listener.onPlayerStateChanged(isPlaying());
@@ -108,7 +108,7 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
     @Override
     public void stop() {
         super.stop();
-        LogUtil.d(TAG, "stop");
+        MusicLibLog.d(TAG, "stop");
         try {
             mCurrentMediaPlayer.reset();
             mIsInitialized = false;
@@ -121,14 +121,14 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
     @Override
     public void release() {
         super.release();
-        LogUtil.d(TAG, "release");
+        MusicLibLog.d(TAG, "release");
         mCurrentMediaPlayer.release();
     }
 
     @Override
     public void pause() {
         super.pause();
-        LogUtil.d(TAG, "pause");
+        MusicLibLog.d(TAG, "pause");
         mCurrentMediaPlayer.pause();
         if (listener != null) {
             listener.onPlayerStateChanged(isPlaying());
@@ -174,7 +174,7 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
     @Override
     public void setVolume(final float vol) {
         super.setVolume(vol);
-        LogUtil.e("Volume", "vol = " + vol);
+        MusicLibLog.e("Volume", "vol = " + vol);
         try {
             mCurrentMediaPlayer.setVolume(vol, vol);
         } catch (Exception e) {
@@ -189,7 +189,7 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
 
     @Override
     public boolean onError(final MediaPlayer mp, final int what, final int extra) {
-        LogUtil.e(TAG, "Music Server Error what: " + what + " extra: " + extra);
+        MusicLibLog.e(TAG, "Music Server Error what: " + what + " extra: " + extra);
         switch (what) {
             case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
                 mIsInitialized = false;
@@ -214,7 +214,7 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
      */
     @Override
     public void onCompletion(final MediaPlayer mp) {
-        LogUtil.e(TAG, "onCompletion");
+        MusicLibLog.e(TAG, "onCompletion");
         if (mp == mCurrentMediaPlayer && listener != null) {
             listener.onCompletionNext();
         } else if (listener != null) {
@@ -224,7 +224,7 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
 
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
-        LogUtil.e(TAG, "onBufferingUpdate" + percent);
+        MusicLibLog.e(TAG, "onBufferingUpdate" + percent);
         if (listener != null) {
             listener.onBufferingUpdate(mp, percent);
         }
@@ -232,7 +232,7 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        LogUtil.d(TAG, "onPrepared");
+        MusicLibLog.d(TAG, "onPrepared");
         mIsPrepared = true;
         if (playWhenReady) {
             mp.start();

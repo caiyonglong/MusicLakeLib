@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.github.dcendents.android-maven'
 
@@ -35,14 +36,23 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.0"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.0"
+
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
     //缓存
     implementation 'com.danikula:videocache:2.7.1'
     implementation 'androidx.media:media:1.1.0'
 
+    api "com.google.code.gson:gson:2.8.5"
+    // Glide dependencies
+    api "com.github.bumptech.glide:glide:4.9.0"
+    kapt "com.github.bumptech.glide:compiler:4.9.0"
+
     api 'com.google.android.exoplayer:exoplayer:2.11.3'
+    api "com.google.android.exoplayer:extension-mediasession:2.11.3"
 }
 
 task sourcesJar(type: Jar) {

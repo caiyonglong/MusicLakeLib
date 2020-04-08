@@ -104,6 +104,6 @@ public class CommonUtils {
     }
 
     private static SharedPreferences getPreferences() {
-        return PreferenceManager.getDefaultSharedPreferences(MusicPlayerManager.getInstance().getAppContext());
+        return PreferenceManager.getDefaultSharedPreferences(MusicPlayerManager.Companion.getInstance().getAppContext());
     }
 }

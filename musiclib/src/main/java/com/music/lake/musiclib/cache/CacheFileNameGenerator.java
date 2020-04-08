@@ -1,7 +1,7 @@
 package com.music.lake.musiclib.cache;
 
 import com.danikula.videocache.file.Md5FileNameGenerator;
-import com.music.lake.musiclib.utils.LogUtil;
+import com.music.lake.musiclib.utils.MusicLibLog;
 
 /**
  * 作者：yonglong
@@ -18,9 +18,9 @@ public class CacheFileNameGenerator extends Md5FileNameGenerator {
         String newUrl = url.split("/")[len - 1].replace(".mp3", "");
         //分割"?"获得xxx.mp3... 字符串
         String newUrl1 = newUrl.split("\\?")[0];
-        LogUtil.d("MusicPlayerEngine", "cache oldUrl =" + url);
-        LogUtil.d("MusicPlayerEngine", "cache newUrl =" + newUrl);
-        LogUtil.d("MusicPlayerEngine", "cache newUrl1 =" + newUrl1);
+        MusicLibLog.d("MusicPlayerEngine", "cache oldUrl =" + url);
+        MusicLibLog.d("MusicPlayerEngine", "cache newUrl =" + newUrl);
+        MusicLibLog.d("MusicPlayerEngine", "cache newUrl1 =" + newUrl1);
         return super.generate(newUrl1);
     }
 }

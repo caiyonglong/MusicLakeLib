@@ -5,7 +5,7 @@ import android.util.Log;
 
 /**
  */
-public class LogUtil {
+public class MusicLibLog {
     /**
      * 默认的tag
      */
@@ -99,26 +99,26 @@ public class LogUtil {
     }
 
     public static void v(int msg) {
-        LogUtil.v(msg + "");
+        MusicLibLog.v(msg + "");
     }
 
     public static void d(int msg) {
-        LogUtil.d(msg + "");
+        MusicLibLog.d(msg + "");
     }
 
     public static void i(int msg) {
-        LogUtil.i(msg + "");
+        MusicLibLog.i(msg + "");
     }
 
     public static void w(int msg) {
-        LogUtil.w(msg + "");
+        MusicLibLog.w(msg + "");
     }
 
     public static void e(int msg) {
-        LogUtil.e(msg + "");
+        MusicLibLog.e(msg + "");
     }
 
     public static void spec(int widthSpeMode) {
-        LogUtil.d(defaultTag, "value = " + widthSpeMode);
+        MusicLibLog.d(defaultTag, "value = " + widthSpeMode);
     }
 }

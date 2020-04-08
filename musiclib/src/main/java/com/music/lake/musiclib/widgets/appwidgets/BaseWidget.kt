@@ -9,7 +9,7 @@ import android.os.Bundle
 import android.widget.RemoteViews
 import androidx.annotation.LayoutRes
 import com.music.lake.musiclib.service.MusicPlayerService
-import com.music.lake.musiclib.utils.LogUtil
+import com.music.lake.musiclib.utils.MusicLibLog
 
 
 /**
@@ -47,7 +47,7 @@ abstract class BaseWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.action
-        LogUtil.e("BaseWidget", "接收到广播-------------" + action!!)
+        MusicLibLog.e("BaseWidget", "接收到广播-------------" + action!!)
         if (action.startsWith("com.cyl.music_lake.")) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val thisAppWidget = ComponentName(context.packageName, this.javaClass.name)

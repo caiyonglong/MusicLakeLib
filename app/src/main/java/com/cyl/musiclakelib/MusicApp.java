@@ -17,19 +17,8 @@ public class MusicApp extends Application {
 
     private void initMusicPlayerService() {
         MusicPlayerConfig config = new MusicPlayerConfig.Builder()
-                .setUseExoPlayer(false)
+                .setUseExoPlayer(true)
                 .create();
-        MusicPlayerManager.getInstance().init(this, config);
-        MusicPlayerManager.getInstance().initialize(this, new BindServiceCallBack() {
-            @Override
-            public void onSuccess() {
-                Log.d("MusicApp", "onSuccess");
-            }
-
-            @Override
-            public void onFailed() {
-                Log.d("MusicApp", "onFailed");
-            }
-        });
+        MusicPlayerManager.Companion.getInstance().init(this, config);
     }
 }

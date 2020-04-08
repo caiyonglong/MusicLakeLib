@@ -15,7 +15,7 @@ import androidx.media.session.MediaButtonReceiver;
 
 import com.music.lake.musiclib.R;
 import com.music.lake.musiclib.player.BasePlayer;
-import com.music.lake.musiclib.utils.LogUtil;
+import com.music.lake.musiclib.utils.MusicLibLog;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
@@ -111,7 +111,7 @@ public class NotifyManager {
     }
 
     public synchronized void updateNotification(boolean isPlaying, boolean isChange, Bitmap bitmap) {
-        LogUtil.d(TAG, "updateNotification() called with: drawableId = [" + isPlaying + "]");
+        MusicLibLog.d(TAG, "updateNotification() called with: drawableId = [" + isPlaying + "]");
         if (mNotificationBuilder == null) return;
         if (isChange) {
             mNotificationBuilder.setLargeIcon(bitmap);

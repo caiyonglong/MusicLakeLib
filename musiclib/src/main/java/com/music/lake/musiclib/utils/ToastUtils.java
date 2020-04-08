@@ -22,7 +22,7 @@ public class ToastUtils {
     public static void show(String info) {
         if (toast != null)
             toast.cancel();
-        toast = Toast.makeText(MusicPlayerManager.getInstance().getAppContext(), info, Toast.LENGTH_SHORT);
+        toast = Toast.makeText(MusicPlayerManager.Companion.getInstance().getAppContext(), info, Toast.LENGTH_SHORT);
         toast.show();
     }
 

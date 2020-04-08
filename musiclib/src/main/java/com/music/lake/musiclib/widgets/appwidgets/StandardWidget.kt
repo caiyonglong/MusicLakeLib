@@ -8,10 +8,10 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.RemoteViews
 import com.music.lake.musiclib.R
-import com.music.lake.musiclib.manager.PlayListManager
+import com.music.lake.musiclib.manager.MediaQueueManager
 import com.music.lake.musiclib.notification.NotifyManager
 import com.music.lake.musiclib.service.MusicPlayerService
-import com.music.lake.musiclib.utils.LogUtil
+import com.music.lake.musiclib.utils.MusicLibLog
 
 class StandardWidget : BaseWidget() {
 
@@ -25,9 +25,9 @@ class StandardWidget : BaseWidget() {
         if (extras != null) {
             remoteViews.setImageViewResource(R.id.app_widgets_play_pause,
                     if (extras.getBoolean(MusicPlayerService.PLAY_STATE_CHANGED, false)) R.drawable.ic_pause else R.drawable.ic_play)
-            val id = when (extras.getInt(PlayListManager.PLAY_MODE, PlayListManager.PLAY_MODE_RANDOM)) {
-                PlayListManager.PLAY_MODE_LOOP -> R.drawable.ic_repeat
-                PlayListManager.PLAY_MODE_REPEAT -> R.drawable.ic_repeat_one
+            val id = when (extras.getInt(MediaQueueManager.PLAY_MODE, MediaQueueManager.PLAY_MODE_RANDOM)) {
+                MediaQueueManager.PLAY_MODE_LOOP -> R.drawable.ic_repeat
+                MediaQueueManager.PLAY_MODE_REPEAT -> R.drawable.ic_repeat_one
                 else -> R.drawable.ic_shuffle
             }
             remoteViews.setImageViewResource(R.id.app_widgets_shuffle, id)
@@ -35,7 +35,7 @@ class StandardWidget : BaseWidget() {
     }
 
     override fun onViewsUpdate(context: Context, remoteViews: RemoteViews, serviceName: ComponentName, extras: Bundle?) {
-        LogUtil.e("StandardWidget", "接收到广播------------- onViewsUpdate")
+        MusicLibLog.e("StandardWidget", "接收到广播------------- onViewsUpdate")
         if (isFirstCreate) {
             remoteViews.setOnClickPendingIntent(R.id.app_widgets_next, retrievePlaybackAction(
                     context,
@@ -127,7 +127,7 @@ class StandardWidget : BaseWidget() {
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-        LogUtil.e("BaseWidget", "接收到广播------------- 第一次创建")
+        MusicLibLog.e("BaseWidget", "接收到广播------------- 第一次创建")
         isFirstCreate = true
         val intent = Intent(context, MusicPlayerService::class.java)
         context.startService(intent)

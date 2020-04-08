@@ -11,7 +11,7 @@ import android.media.session.MediaSession;
 
 import com.music.lake.musiclib.service.MediaButtonIntentReceiver;
 import com.music.lake.musiclib.service.MusicPlayerService;
-import com.music.lake.musiclib.utils.LogUtil;
+import com.music.lake.musiclib.utils.MusicLibLog;
 import com.music.lake.musiclib.utils.SystemUtils;
 
 import static com.music.lake.musiclib.service.MusicPlayerService.AUDIO_FOCUS_CHANGE;
@@ -66,7 +66,7 @@ public class AudioAndFocusManager {
                     .build();
             int res = mAudioManager.requestAudioFocus(mAudioFocusRequest);
             if (res == 1) {
-                LogUtil.e("requestAudioFocus=" + true);
+                MusicLibLog.e("requestAudioFocus=" + true);
             }
         } else {
             if (audioFocusChangeListener != null) {
@@ -74,7 +74,7 @@ public class AudioAndFocusManager {
                         mAudioManager.requestAudioFocus(audioFocusChangeListener,
                                 AudioManager.STREAM_MUSIC,
                                 AudioManager.AUDIOFOCUS_GAIN);
-                LogUtil.e("requestAudioFocus=" + result);
+                MusicLibLog.e("requestAudioFocus=" + result);
             }
         }
     }
@@ -86,7 +86,7 @@ public class AudioAndFocusManager {
         if (audioFocusChangeListener != null) {
             boolean result = AudioManager.AUDIOFOCUS_REQUEST_GRANTED ==
                     mAudioManager.abandonAudioFocus(audioFocusChangeListener);
-            LogUtil.e("requestAudioFocus=" + result);
+            MusicLibLog.e("requestAudioFocus=" + result);
         }
     }
 
@@ -97,7 +97,7 @@ public class AudioAndFocusManager {
     private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
-            LogUtil.e("OnAudioFocusChangeListener", focusChange + "---");
+            MusicLibLog.e("OnAudioFocusChangeListener", focusChange + "---");
             mHandler.obtainMessage(AUDIO_FOCUS_CHANGE, focusChange, 0).sendToTarget();
         }
     };
