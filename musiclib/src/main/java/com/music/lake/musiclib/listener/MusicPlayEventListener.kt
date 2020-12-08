@@ -3,6 +3,7 @@ package com.music.lake.musiclib.listener
 import com.music.lake.musiclib.bean.BaseMusicInfo
 
 interface MusicPlayEventListener {
+    fun onMetaChanged(musicInfo: BaseMusicInfo?)
     fun onLoading(isLoading: Boolean)
     fun onPlaybackProgress(curPosition: Long, duration: Long, bufferPercent: Int)
     fun onAudioSessionId(audioSessionId: Int)

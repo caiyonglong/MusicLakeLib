@@ -71,7 +71,7 @@ public class SystemUtils {
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private static boolean isNoOptns() {
-        PackageManager packageManager = MusicPlayerManager.Companion.getInstance().getAppContext().getPackageManager();
+        PackageManager packageManager = MusicPlayerManager.getInstance().getAppContext().getPackageManager();
         Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
         List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
         return list.size() > 0;
@@ -86,7 +86,7 @@ public class SystemUtils {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private static boolean isNoSwitch() {
         long dujinyang = System.currentTimeMillis();
-        UsageStatsManager usageStatsManager = (UsageStatsManager) MusicPlayerManager.Companion.getInstance().getAppContext().getSystemService(Context.USAGE_STATS_SERVICE);
+        UsageStatsManager usageStatsManager = (UsageStatsManager) MusicPlayerManager.getInstance().getAppContext().getSystemService(Context.USAGE_STATS_SERVICE);
         List<UsageStats> queryUsageStats = null;
         if (usageStatsManager != null) {
             queryUsageStats = usageStatsManager.queryUsageStats(

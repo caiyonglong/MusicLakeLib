@@ -21,6 +21,16 @@ object MediaQueueManager {
     private var mNowPlayingIndex = -1
     private var mNowPlayingMusic: BaseMusicInfo? = null
 
+    /**
+     * 总共多少首歌曲
+     */
+    private var orderList = mutableListOf<Int>()
+    private var saveList = mutableListOf<Int>()
+    private var randomPosition = 0
+
+    val mPlaylist = mutableListOf<BaseMusicInfo>()
+    val mHistoryPos = mutableListOf<Int>()
+
     fun getNowPlayingIndex(): Int {
         return mNowPlayingIndex
     }
@@ -36,18 +46,6 @@ object MediaQueueManager {
         mNowPlayingMusic = mPlaylist[mNowPlayingIndex]
         return mNowPlayingMusic
     }
-
-
-    /**
-     * 总共多少首歌曲
-     */
-    private var total = 0
-    private var orderList = mutableListOf<Int>()
-    private var saveList = mutableListOf<Int>()
-    private var randomPosition = 0
-
-    val mPlaylist = mutableListOf<BaseMusicInfo>()
-    val mHistoryPos = mutableListOf<Int>()
 
     /**
      * 更新播放模式
@@ -72,7 +70,6 @@ object MediaQueueManager {
     }
 
     private fun initOrderList(total: Int) {
-        MediaQueueManager.total = total
         orderList.clear()
         for (i in 0 until total) {
             orderList.add(i)
@@ -93,30 +90,32 @@ object MediaQueueManager {
      *
      * @return isAuto 是否自动下一曲
      */
-    fun getNextPosition(isAuto: Boolean?, curPosition: Int): Int {
-        if (total == 1) {
+    fun getNextPosition(isAuto: Boolean?): Int {
+        if (mPlaylist.size == 1) {
+            mNowPlayingIndex = 0
             return 0
         }
-        initOrderList(total)
+        initOrderList(mPlaylist.size)
         if (playingModeId == PLAY_MODE_REPEAT && isAuto!!) {
-            return if (curPosition < 0) {
+            mNowPlayingIndex = if (mNowPlayingIndex < 0) {
                 0
             } else {
-                curPosition
+                mNowPlayingIndex
             }
         } else if (playingModeId == PLAY_MODE_RANDOM) {
             printOrderList(orderList[randomPosition])
             saveList.add(orderList[randomPosition])
-            return orderList[randomPosition]
+            mNowPlayingIndex = orderList[randomPosition]
         } else {
-            if (curPosition == total - 1) {
-                return 0
-            } else if (curPosition < total - 1) {
-                return curPosition + 1
+            if (mNowPlayingIndex == mPlaylist.size - 1) {
+                mNowPlayingIndex = 0
+            } else if (mNowPlayingIndex < mPlaylist.size - 1) {
+                mNowPlayingIndex += 1
+            } else {
+                mNowPlayingIndex = mPlaylist.size - 1
             }
         }
-        mNowPlayingIndex = curPosition
-        return curPosition
+        return mNowPlayingIndex
     }
 
     /**
@@ -124,16 +123,17 @@ object MediaQueueManager {
      *
      * @return isAuto 是否自动下一曲
      */
-    fun getPreviousPosition(curPosition: Int): Int {
-        if (total == 1) {
+    fun getPreviousPosition(): Int {
+        if (mPlaylist.size == 1) {
+            mNowPlayingIndex = 0
             return 0
         }
         getLoopMode()
         if (playingModeId == PLAY_MODE_REPEAT) {
-            return if (curPosition < 0) {
+            mNowPlayingIndex = if (mNowPlayingIndex < 0) {
                 0
             } else {
-                curPosition
+                mNowPlayingIndex
             }
         } else if (playingModeId == PLAY_MODE_RANDOM) {
             randomPosition = if (saveList.size > 0) {
@@ -142,43 +142,53 @@ object MediaQueueManager {
             } else {
                 randomPosition--
                 if (randomPosition < 0) {
-                    randomPosition = total - 1
+                    randomPosition = mPlaylist.size - 1
                 }
                 orderList[randomPosition]
             }
             printOrderList(randomPosition)
-            return randomPosition
+            mNowPlayingIndex = randomPosition
         } else {
-            if (curPosition == 0) {
-                return total - 1
-            } else if (curPosition > 0) {
-                return curPosition - 1
+            if (mNowPlayingIndex == 0) {
+                mNowPlayingIndex = mPlaylist.size - 1
+            } else if (mNowPlayingIndex > 0) {
+                mNowPlayingIndex -= 1
             }
         }
-        mNowPlayingIndex = curPosition
-        return curPosition
+        return mNowPlayingIndex
     }
 
-    fun updatePlaylist(list: MutableList<BaseMusicInfo>, id: Int, pid: String) {
+    fun updatePlaylist(list: MutableList<BaseMusicInfo>, id: Int) {
         mPlaylist.clear()
         mPlaylist.addAll(list)
         mNowPlayingIndex = id
     }
 
+    fun removeFromPlaylist(index: Int) {
+    }
+
     fun setNowPlayingIndex(position: Int): Int {
-        if (position >= mPlaylist.size || position == -1) {
-            mNowPlayingIndex = getNextPosition(true, position)
+        mNowPlayingIndex = if (position >= mPlaylist.size || position == -1) {
+            getNextPosition(true)
         } else {
-            mNowPlayingIndex = position
+            position
         }
         return mNowPlayingIndex;
+    }
+
+    fun setNowPlayingMusic(musicInfo: BaseMusicInfo?) {
+        musicInfo?.let {
+            mNowPlayingMusic = it
+            mPlaylist.add(it)
+            mNowPlayingIndex = mPlaylist.size - 1
+        }
     }
 
     /**
      * 打印当前顺序
      */
     private fun printOrderList(cur: Int) {
-        MusicLibLog.e("PlayQueueManager", orderList.toString() + " --- $cur")
+        MusicLibLog.d("PlayQueueManager", "$orderList --- $cur")
     }
 
     fun clear() {

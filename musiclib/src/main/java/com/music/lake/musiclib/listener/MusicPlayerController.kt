@@ -17,12 +17,12 @@ interface MusicPlayerController {
     /**
      * 播放歌曲列表
      */
-    fun playMusic(songs: List<BaseMusicInfo>, index: Int)
+    fun playMusic(songs: MutableList<BaseMusicInfo>, index: Int)
 
     /**
      * 更新歌曲列表
      */
-    fun updatePlaylist(songs: List<BaseMusicInfo>, index: Int)
+    fun updatePlaylist(songs: MutableList<BaseMusicInfo>, index: Int)
 
     /**
      * 播放下一首

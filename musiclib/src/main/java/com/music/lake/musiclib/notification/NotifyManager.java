@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.media.session.MediaButtonReceiver;
 
 import com.music.lake.musiclib.R;
+import com.music.lake.musiclib.manager.MediaQueueManager;
 import com.music.lake.musiclib.player.BasePlayer;
 import com.music.lake.musiclib.utils.MusicLibLog;
 
@@ -111,10 +112,15 @@ public class NotifyManager {
     }
 
     public synchronized void updateNotification(boolean isPlaying, boolean isChange, Bitmap bitmap) {
-        MusicLibLog.d(TAG, "updateNotification() called with: drawableId = [" + isPlaying + "]");
+        MusicLibLog.d(TAG, "updateNotification() isChange：" + isChange + "， isPlaying = [" + isPlaying + "]");
         if (mNotificationBuilder == null) return;
         if (isChange) {
-            mNotificationBuilder.setLargeIcon(bitmap);
+            basePlayerImpl.mNowPlayingMusic = MediaQueueManager.INSTANCE.getNowPlayingMusic();
+            MusicLibLog.d(TAG, "updateNotification() getTitle：" + basePlayerImpl.getTitle()
+                    + "， getArtistName = " + basePlayerImpl.getArtistName());
+            if (bitmap != null) {
+                mNotificationBuilder.setLargeIcon(bitmap);
+            }
             mNotificationBuilder.setContentTitle(basePlayerImpl.getTitle());
             mNotificationBuilder.setContentText(basePlayerImpl.getArtistName());
             mNotificationBuilder.setTicker(basePlayerImpl.getTitle() + "-" + basePlayerImpl.getArtistName());

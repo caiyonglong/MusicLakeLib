@@ -56,7 +56,7 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
             if (listener != null) {
                 listener.onPlayerStateChanged(false);
             }
-            boolean cacheSetting = MusicPlayerManager.Companion.getInstance().isHasCache();
+            boolean cacheSetting = MusicPlayerManager.getInstance().isHasCache();
             MusicLibLog.d(TAG, "缓存设置：" + cacheSetting + " path =" + path);
             //本地歌曲无需缓存
             if (path.startsWith("content://") || path.startsWith("/storage")) {
@@ -232,7 +232,7 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        MusicLibLog.d(TAG, "onPrepared");
+        MusicLibLog.d(TAG, "onPrepared playWhenReady=" + playWhenReady);
         mIsPrepared = true;
         if (playWhenReady) {
             mp.start();

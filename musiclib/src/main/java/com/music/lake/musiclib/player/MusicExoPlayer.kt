@@ -8,9 +8,7 @@ import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.MediaSourceEventListener
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.*
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerControlView
@@ -51,7 +49,7 @@ class MusicExoPlayer(var context: Context) : BasePlayer(), Player.EventListener 
 
     private var bandwidthMeter: DefaultBandwidthMeter = DefaultBandwidthMeter()
     private var videoTrackSelectionFactory: AdaptiveTrackSelection.Factory =
-        AdaptiveTrackSelection.Factory(bandwidthMeter)
+        AdaptiveTrackSelection.Factory()
     private val trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
     private var loadControl: LoadControl? = null
 
@@ -240,8 +238,8 @@ class MusicExoPlayer(var context: Context) : BasePlayer(), Player.EventListener 
      * 播放sessionId
      */
     override fun getAudioSessionId(): Int {
-        exoPlayer?.audioSessionId.let {
-            if (it == null || it <= 0) return 0
+        exoPlayer.audioSessionId.let {
+            if (it <= 0) return 0
             return it
         }
     }
@@ -264,7 +262,7 @@ class MusicExoPlayer(var context: Context) : BasePlayer(), Player.EventListener 
     }
 
     private fun buildMediaSource(uri: Uri): MediaSource? {
-        return ProgressiveMediaSource.Factory(mediaDataSourceFactory).createMediaSource(uri)
+        return mediaDataSourceFactory?.let { ProgressiveMediaSource.Factory(it).createMediaSource(uri) }
     }
 
     /*********************************************************************************
@@ -327,14 +325,18 @@ class MusicExoPlayer(var context: Context) : BasePlayer(), Player.EventListener 
 
         override fun onLoadError(
             eventTime: AnalyticsListener.EventTime,
-            loadEventInfo: MediaSourceEventListener.LoadEventInfo,
-            mediaLoadData: MediaSourceEventListener.MediaLoadData,
+            loadEventInfo: LoadEventInfo,
+            mediaLoadData: MediaLoadData,
             error: IOException,
             wasCanceled: Boolean
         ) {
             super.onLoadError(eventTime, loadEventInfo, mediaLoadData, error, wasCanceled)
             MusicLibLog.d(TAG, "onLoadError ${error.message}")
-            playbackListener?.onError()
+            if (error.message?.contains("403") == true) {
+                MusicLibLog.d(TAG, "onLoadError 播放地址异常")
+            } else {
+                playbackListener?.onError()
+            }
         }
     }
 

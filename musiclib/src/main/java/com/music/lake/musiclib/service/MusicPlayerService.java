@@ -13,7 +13,6 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,7 +37,6 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 import com.music.lake.musiclib.MusicPlayerManager;
 import com.music.lake.musiclib.bean.BaseMusicInfo;
 import com.music.lake.musiclib.listener.MusicPlayEventListener;
-import com.music.lake.musiclib.listener.MusicPlayerController;
 import com.music.lake.musiclib.listener.MusicRequestCallBack;
 import com.music.lake.musiclib.listener.MusicUrlRequest;
 import com.music.lake.musiclib.manager.AudioAndFocusManager;
@@ -80,7 +78,7 @@ import static com.music.lake.musiclib.notification.NotifyManager.ACTION_SHUFFLE;
  * 邮箱：643872807@qq.com
  * 版本：3.0 播放service
  */
-public class MusicPlayerService extends MediaBrowserServiceCompat implements MusicPlayerController, PlaybackListener {
+public class MusicPlayerService extends MediaBrowserServiceCompat implements PlaybackListener {
     private static final String TAG = "MusicPlayerService";
 
     public static final String ACTION_SERVICE = "com.cyl.music_lake.service";// 广播标志
@@ -188,136 +186,6 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
     private List<MusicPlayEventListener> playbackListeners = new ArrayList<>();
 
     @Override
-    public void playMusicById(int index) {
-        playMusic(index);
-    }
-
-    @Override
-    public void playMusic(BaseMusicInfo song) {
-        play(song);
-    }
-
-    @Override
-    public void playMusic(List<BaseMusicInfo> songs, int index) {
-        play(songs, index, "");
-    }
-
-    @Override
-    public void updatePlaylist(List<BaseMusicInfo> songs, int index) {
-        playWhenReady = false;
-        updatePlaylist(songs, index, "");
-    }
-
-    @Override
-    public void playNextMusic() {
-        next(false);
-    }
-
-    @Override
-    public void playPrevMusic() {
-        prev();
-    }
-
-    @Override
-    public void restorePlay() {
-        play();
-    }
-
-    @Override
-    public void pausePlay() {
-        playPause();
-    }
-
-    @Override
-    public void stopPlay() {
-        stop(true);
-    }
-
-    @Override
-    public void setLoopMode(int mode) {
-        MediaQueueManager.INSTANCE.setLoopMode(mode);
-    }
-
-    @Override
-    public int getLoopMode() {
-        return MediaQueueManager.INSTANCE.getLoopMode();
-    }
-
-    @Override
-    public void seekTo(long ms) {
-        seekTo(ms, false);
-    }
-
-    @NotNull
-    @Override
-    public BaseMusicInfo getNowPlayingMusic() {
-        return mNowPlayingMusic;
-    }
-
-    @Override
-    public int getNowPlayingIndex() {
-        return mNowPlayingIndex;
-    }
-
-    @NotNull
-    @Override
-    public List<BaseMusicInfo> getPlayList() {
-        return MediaQueueManager.INSTANCE.getMPlaylist();
-    }
-
-    @Override
-    public void removeFromPlaylist(int position) {
-        removeFromQueue(position);
-    }
-
-    @Override
-    public void clearPlaylist() {
-        clearQueue();
-    }
-
-    /**
-     * 获取正在播放进度
-     */
-    @Override
-    public long getPlayingPosition() {
-        if (mPlayer != null && mPlayer.isInitialized()) {
-            return mPlayer.position();
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public void addMusicPlayerEventListener(@NotNull MusicPlayEventListener listener) {
-        playbackListeners.add(listener);
-    }
-
-    @Override
-    public void removeMusicPlayerEventListener(@NotNull MusicPlayEventListener listener) {
-        playbackListeners.remove(listener);
-    }
-
-    @Override
-    public void showDesktopLyric(boolean show) {
-
-    }
-
-    @Override
-    public int AudioSessionId() {
-        if (mPlayer != null && mPlayer.isInitialized()) {
-            return mPlayer.getAudioSessionId();
-        }
-        return -1;
-    }
-
-    @Override
-    public void setMusicRequestListener(@NotNull MusicUrlRequest request) {
-        MusicLibLog.d(TAG, "setMusicRequestListener " + request);
-        musicUrlRequest = request;
-    }
-
-
-    @Override
     public void onCompletionNext() {
         next(true);
     }
@@ -351,8 +219,8 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
     @Override
     public void onError() {
         ToastUtils.show("歌曲播放地址异常，请切换其他歌曲");
-        playErrorTimes++;
-        next(true);
+//        playErrorTimes++;
+//        next(true);
     }
 
     @Override
@@ -375,7 +243,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
             playWhenReady = true;
         }
         notifyChange(PLAY_STATE_CHANGED);
-        notifyManager.updateNotification(isMusicPlaying, false, null);
+        notifyManager.updateNotification(isMusicPlaying, true, null);
         for (int i = 0; i < playbackListeners.size(); i++) {
             playbackListeners.get(i).onPlayerStateChanged(isMusicPlaying);
         }
@@ -571,25 +439,24 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
      * 初始化音乐播放服务
      */
     private void initMediaPlayer() {
-        if (MusicPlayerManager.Companion.getInstance().getUseExoPlayer()) {
+        if (MusicPlayerManager.getInstance().isUseExoPlayer()) {
             mPlayer = new MusicExoPlayer(this);
         } else {
             mPlayer = new MusicMediaPlayer(this);
         }
         mPlayer.setPlayBackListener(this);
-        mPlayerTask = new TimerTask() {
-            public void run() {
-                mMainHandler.post(() -> {
-                    for (int i = 0; i < playbackListeners.size(); i++) {
-                        playbackListeners.get(i).onPlaybackProgress(getPlayingPosition(), getDuration(), getBufferedPercentage());
-                    }
-                });
-            }
-        };
-        mPlayerTimer = new Timer();
-        mPlayerTimer.schedule(mPlayerTask, 0, 400);
-
-        playbackManager = new PlaybackManager(mPlayer, mMainHandler);
+//        mPlayerTask = new TimerTask() {
+//            public void run() {
+//                mMainHandler.post(() -> {
+//                    for (int i = 0; i < playbackListeners.size(); i++) {
+//                        playbackListeners.get(i).onPlaybackProgress(getPlayingPosition(), getDuration(), getBufferedPercentage());
+//                    }
+//                });
+//            }
+////        };
+//        mPlayerTimer = new Timer();
+//        mPlayerTimer.schedule(mPlayerTask, 0, 400);
+        playbackManager = new PlaybackManager(this, mMainHandler, this);
         mediaSession.setCallback(playbackManager.getMediaSessionCallback(), mHandler);
         mediaSession.setActive(true);
     }
@@ -710,7 +577,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
      */
     public void next(Boolean isAuto) {
         synchronized (this) {
-            mNowPlayingIndex = MediaQueueManager.INSTANCE.getNextPosition(isAuto, mNowPlayingIndex);
+            mNowPlayingIndex = MediaQueueManager.INSTANCE.getNextPosition(isAuto);
             MusicLibLog.e(TAG, "next: " + mNowPlayingIndex);
             stop(false);
             playCurrentAndNext();
@@ -722,7 +589,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
      */
     public void prev() {
         synchronized (this) {
-            mNowPlayingIndex = MediaQueueManager.INSTANCE.getPreviousPosition(mNowPlayingIndex);
+            mNowPlayingIndex = MediaQueueManager.INSTANCE.getPreviousPosition();
             MusicLibLog.e(TAG, "prev: " + mNowPlayingIndex);
             stop(false);
             playCurrentAndNext();
@@ -787,6 +654,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
                 mNowPlayingMusic.setUri(url);
                 playErrorTimes = 0;
                 mPlayer.playWhenReady = playWhenReady;
+                notifyManager.updateNotification(isMusicPlaying, true, null);
                 mPlayer.setDataSource(url);
             }
 
@@ -838,7 +706,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
      */
     public void playMusic(int position) {
         if (position >= MediaQueueManager.INSTANCE.getMPlaylist().size() || position == -1) {
-            mNowPlayingIndex = MediaQueueManager.INSTANCE.getNextPosition(true, position);
+            mNowPlayingIndex = MediaQueueManager.INSTANCE.getNextPosition(true);
         } else {
             mNowPlayingIndex = position;
         }
@@ -1129,6 +997,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
         MusicLibLog.d(TAG, "notifyChange: what = " + what);
         switch (what) {
             case META_CHANGED:
+                mediaSession.setMetadata(new MediaMetadataCompat.Builder().putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, "ddd").build());
                 updateWidget(META_CHANGED);
                 break;
             case PLAY_STATE_CHANGED:
@@ -1150,7 +1019,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
      * 更新播放状态， 播放／暂停／拖动进度条时调用
      */
     void updatePlaybackState() {
-        MusicLibLog.d(TAG, "isPlaying=  $isPlaying");
+        MusicLibLog.d(TAG, "isPlaying=  " + isPlaying());
 //        if (isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED
 //        mediaSession.setPlaybackState(
 //                PlaybackStateCompat.Builder()
@@ -1164,11 +1033,11 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
      * 更新桌面小控件
      */
     private void updateWidget(String action) {
-        Intent intent = new Intent(action);
-        intent.putExtra(ACTION_IS_WIDGET, true);
-        intent.putExtra(PLAY_STATE_CHANGED, isPlaying());
-        intent.putExtra(MediaQueueManager.PLAY_MODE, getLoopMode());
-        sendBroadcast(intent);
+//        Intent intent = new Intent(action);
+//        intent.putExtra(ACTION_IS_WIDGET, true);
+//        intent.putExtra(PLAY_STATE_CHANGED, isPlaying());
+//        intent.putExtra(MediaQueueManager.PLAY_MODE, getLoopMode());
+//        sendBroadcast(intent);
     }
 
     /**
@@ -1319,7 +1188,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
         final String command = SERVICE_CMD.equals(action) ? intent.getStringExtra(CMD_NAME) : action;
         MusicLibLog.d(TAG, "handleCommandIntent: action = " + action + ", command = " + command);
         if (PLAY_STATE_CHANGED.equals(action)) {
-            pausePlay();
+            playbackManager.pausePlay();
             return;
         }
         if (command == null) return;
@@ -1340,7 +1209,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Mus
                 break;
             case CMD_TOGGLE_PAUSE:
             case ACTION_PLAY_PAUSE:
-                pausePlay();
+                playbackManager.pausePlay();
                 break;
             case ACTION_CLOSE:
                 stop(true);
