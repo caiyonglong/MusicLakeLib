@@ -1,6 +1,6 @@
 package com.music.lake.musiclib.cache;
 
-import com.danikula.videocache.file.Md5FileNameGenerator;
+import com.music.lake.musiclib.videocache.file.Md5FileNameGenerator;
 import com.music.lake.musiclib.utils.MusicLibLog;
 
 /**

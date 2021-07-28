@@ -8,7 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.danikula.videocache.HttpProxyCacheServer;
+import com.music.lake.musiclib.videocache.HttpProxyCacheServer;
 import com.music.lake.musiclib.cache.CacheFileNameGenerator;
 import com.music.lake.musiclib.listener.BindServiceCallBack;
 import com.music.lake.musiclib.listener.MusicUrlRequest;

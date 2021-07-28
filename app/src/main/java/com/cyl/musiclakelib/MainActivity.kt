@@ -7,20 +7,22 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.cyl.musiclakelib.databinding.ActivityMainBinding
 import com.music.lake.musiclib.MusicPlayerManager
 import com.music.lake.musiclib.bean.BaseMusicInfo
 import com.music.lake.musiclib.listener.MusicPlayEventListener
 import com.music.lake.musiclib.utils.MusicLibLog
-import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
     val musicInfo = BaseMusicInfo()
     val musiclist = mutableListOf<BaseMusicInfo>()
+    lateinit var viewBinding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        viewBinding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
         initData();
         initListener()
         verifyStoragePermissions(this);
@@ -47,7 +49,7 @@ class MainActivity : AppCompatActivity() {
             })
             content += data[i].split("/")[6] + "\n"
         }
-        contentTv.text = content
+        viewBinding.contentTv.text = content
     }
 
     private fun initListener() {
@@ -55,7 +57,7 @@ class MainActivity : AppCompatActivity() {
             .addMusicPlayerEventListener(object : MusicPlayEventListener {
                 override fun onMetaChanged(musicInfo: BaseMusicInfo?) {
                     runOnUiThread {
-                        titleTv.text = musicInfo?.title
+                        viewBinding.titleTv.text = musicInfo?.title
                     }
                 }
 
@@ -91,20 +93,18 @@ class MainActivity : AppCompatActivity() {
                 }
 
             })
-        initBtn.setOnClickListener {
-            titleTv.text = musicInfo.title
+        viewBinding.initBtn.setOnClickListener {
+            viewBinding.titleTv.text = musicInfo.title
             MusicPlayerManager.getControl().updatePlaylist(musiclist, 0)
-        }
-        prevBtn.setOnClickListener {
-            MusicPlayerManager.getControl().playPrevMusic()
-        }
-        nextBtn.setOnClickListener {
-            MusicPlayerManager.getControl().playNextMusic()
-        }
-        playBtn.setOnClickListener {
             MusicPlayerManager.getControl().playMusic(musicInfo)
         }
-        pauseBtn.setOnClickListener {
+        viewBinding.prevBtn.setOnClickListener {
+            MusicPlayerManager.getControl().playPrevMusic()
+        }
+        viewBinding.nextBtn.setOnClickListener {
+            MusicPlayerManager.getControl().playNextMusic()
+        }
+        viewBinding.playPauseBtn.setOnClickListener {
             MusicPlayerManager.getControl().pausePlay()
         }
     }

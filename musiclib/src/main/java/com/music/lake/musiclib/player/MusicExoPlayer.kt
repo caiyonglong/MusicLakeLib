@@ -262,7 +262,9 @@ class MusicExoPlayer(var context: Context) : BasePlayer(), Player.EventListener 
     }
 
     private fun buildMediaSource(uri: Uri): MediaSource? {
-        return mediaDataSourceFactory?.let { ProgressiveMediaSource.Factory(it).createMediaSource(uri) }
+        return mediaDataSourceFactory?.let {
+            ProgressiveMediaSource.Factory(it).createMediaSource(uri)
+        }
     }
 
     /*********************************************************************************
@@ -278,8 +280,8 @@ class MusicExoPlayer(var context: Context) : BasePlayer(), Player.EventListener 
      *********************************************************************************
      */
     private inner class PlayerEventLogger : EventLogger(trackSelector) {
-        override fun onAudioSessionId(eventTime: AnalyticsListener.EventTime, audioSessionId: Int) {
-            super.onAudioSessionId(eventTime, audioSessionId)
+        override fun onAudioSessionIdChanged(eventTime: AnalyticsListener.EventTime, audioSessionId: Int) {
+            super.onAudioSessionIdChanged(eventTime, audioSessionId)
             MusicLibLog.d(TAG, "onAudioSessionId ${eventTime.realtimeMs} $audioSessionId")
         }
 
@@ -293,25 +295,24 @@ class MusicExoPlayer(var context: Context) : BasePlayer(), Player.EventListener 
             )
         }
 
-
         override fun onLoadingChanged(eventTime: AnalyticsListener.EventTime, isLoading: Boolean) {
             super.onLoadingChanged(eventTime, isLoading)
             MusicLibLog.d(TAG, "onLoadingChanged ${eventTime.realtimeMs} $isLoading")
             playbackListener?.onLoading(isLoading)
         }
 
-        override fun onPlayerStateChanged(
-            eventTime: AnalyticsListener.EventTime,
-            playWhenReady: Boolean,
-            state: Int
-        ) {
-            super.onPlayerStateChanged(eventTime, playWhenReady, state)
+        override fun onPlaybackStateChanged(eventTime: AnalyticsListener.EventTime, state: Int) {
+            super.onPlaybackStateChanged(eventTime, state)
             MusicLibLog.d(TAG, "onPlayerStateChanged ${eventTime.realtimeMs} $playWhenReady $state")
             if (state == Player.STATE_ENDED) {
                 playbackListener?.onCompletionNext()
             } else if (state == Player.STATE_READY) {
-                playbackListener?.onPlayerStateChanged(playWhenReady)
             }
+        }
+
+        override fun onPlayWhenReadyChanged(eventTime: AnalyticsListener.EventTime, playWhenReady: Boolean, reason: Int) {
+            super.onPlayWhenReadyChanged(eventTime, playWhenReady, reason)
+            playbackListener?.onPlayerStateChanged(playWhenReady)
         }
 
         override fun onPlayerError(

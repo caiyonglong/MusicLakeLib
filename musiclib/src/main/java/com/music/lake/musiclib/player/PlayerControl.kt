@@ -69,7 +69,7 @@ class PlayerControl(context: Context) : MusicPlayerController {
     }
 
     override fun pausePlay() {
-        transportControls?.play()
+        transportControls?.pause()
     }
 
     override fun stopPlay() {

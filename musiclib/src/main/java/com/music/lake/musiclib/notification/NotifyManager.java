@@ -18,8 +18,6 @@ import com.music.lake.musiclib.manager.MediaQueueManager;
 import com.music.lake.musiclib.player.BasePlayer;
 import com.music.lake.musiclib.utils.MusicLibLog;
 
-import static android.content.Context.NOTIFICATION_SERVICE;
-
 /**
  * Created by master on 2018/5/14.
  * 通知栏管理类
@@ -78,11 +76,11 @@ public class NotifyManager {
                 .setContentTitle(basePlayerImpl.getTitle())
                 .setContentText(basePlayerImpl.getArtistName())
                 .setWhen(mNotificationPostTime)
-                .addAction(R.drawable.ic_play, "",
-                        retrievePlaybackAction(ACTION_PLAY_PAUSE))
                 .addAction(R.drawable.ic_skip_previous,
                         "",
                         retrievePlaybackAction(ACTION_PREV))
+                .addAction(R.drawable.ic_play, "",
+                        retrievePlaybackAction(ACTION_PLAY_PAUSE))
                 .addAction(R.drawable.ic_skip_next,
                         "",
                         retrievePlaybackAction(ACTION_NEXT))
@@ -103,7 +101,7 @@ public class NotifyManager {
 
     public void setupNotification() {
         if (basePlayerImpl == null) return;
-        mNotificationManager = (NotificationManager) mService.getSystemService(NOTIFICATION_SERVICE);
+        mNotificationManager = (NotificationManager) mService.getSystemService(mService.NOTIFICATION_SERVICE);
         if (mNotificationPostTime == 0) {
             mNotificationPostTime = System.currentTimeMillis();
         }
@@ -123,12 +121,13 @@ public class NotifyManager {
             }
             mNotificationBuilder.setContentTitle(basePlayerImpl.getTitle());
             mNotificationBuilder.setContentText(basePlayerImpl.getArtistName());
-            mNotificationBuilder.setTicker(basePlayerImpl.getTitle() + "-" + basePlayerImpl.getArtistName());
+            mNotification.tickerText = basePlayerImpl.getTitle() + "-" + basePlayerImpl.getArtistName();
         }
-        mNotificationBuilder.mActions.get(0).icon = isPlaying ? R.drawable.ic_pause : R.drawable.ic_play;
+        mNotification.actions[1].icon = isPlaying ? R.drawable.ic_pause : R.drawable.ic_play;
+        mNotification = mNotificationBuilder.build();
         //前台服务
         mService.startForeground(NOTIFICATION_ID, mNotification);
-        mNotificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
+        mNotificationManager.notify(NOTIFICATION_ID, mNotification);
     }
 
     public void close() {

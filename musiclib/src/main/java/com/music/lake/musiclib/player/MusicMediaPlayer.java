@@ -5,7 +5,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.PowerManager;
 
-import com.danikula.videocache.HttpProxyCacheServer;
+import com.music.lake.musiclib.videocache.HttpProxyCacheServer;
 import com.music.lake.musiclib.MusicPlayerManager;
 import com.music.lake.musiclib.bean.BaseMusicInfo;
 import com.music.lake.musiclib.utils.MusicLibLog;
