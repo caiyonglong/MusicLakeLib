@@ -18,7 +18,7 @@ import com.music.lake.musiclib.manager.MediaQueueManager.mHistoryPos
 import com.music.lake.musiclib.notification.INotification
 import com.music.lake.musiclib.playback.IPlaybackManager
 import com.music.lake.musiclib.playback.PlaybackListener
-import com.music.lake.musiclib.player.BasePlayer
+import com.music.lake.musiclib.player.BaseLakePlayer
 import com.music.lake.musiclib.player.MusicExoPlayer
 import com.music.lake.musiclib.player.MusicMediaPlayer
 import com.music.lake.musiclib.service.MusicPlayerService
@@ -45,14 +45,14 @@ class PlaybackManager constructor(
     private var playErrorTimes = 0
     private val MAX_ERROR_TIMES = 1
 
-    private val mPlayer: BasePlayer = if (MusicPlayerManager.getInstance().isUseExoPlayer) {
+    private val mLakePlayer: BaseLakePlayer = if (MusicPlayerManager.getInstance().isUseExoPlayer) {
         MusicExoPlayer(context)
     } else {
         MusicMediaPlayer(context)
     }
 
     init {
-        mPlayer.setPlayBackListener(listener)
+        mLakePlayer.setPlayBackListener(listener)
         mMediaSessionCallback = MediaSessionCallback();
         musicPlayEventListener = MusicPlayerManager.getControl().getPlayEventListener()
     }
@@ -100,23 +100,26 @@ class PlaybackManager constructor(
                 override fun onMusicValid(url: String) {
                     MusicLibLog.e(TAG, "checkNonValid-----$url")
                     mNowPlayingMusic?.uri = url
-                    mPlayer.playWhenReady = playWhenReady
-                    mPlayer.setDataSource(url)
+                    mLakePlayer.playWhenReady = playWhenReady
+                    mLakePlayer.setDataSource(url)
                 }
 
                 override fun onActionDirect() {
-                    mPlayer.playWhenReady = playWhenReady
-                    mPlayer.setDataSource(mNowPlayingMusic!!.uri)
+                    mLakePlayer.playWhenReady = playWhenReady
+                    mLakePlayer.setDataSource(mNowPlayingMusic!!.uri)
                 }
             })
         }
     }
 
+    /**
+     * 播放暂停
+     */
     fun pausePlay() {
-        if (mPlayer.isPlaying()) {
-            mPlayer.pause()
+        if (mLakePlayer.isPlaying()) {
+            mLakePlayer.pause()
         } else {
-            mPlayer.playWhenReady = true
+            mLakePlayer.play()
         }
     }
 
@@ -126,8 +129,8 @@ class PlaybackManager constructor(
      * @param remove_status_icon
      */
     fun stop(remove_status_icon: Boolean) {
-        if (remove_status_icon && mPlayer.isInitialized()) {
-            mPlayer.stop()
+        if (remove_status_icon && mLakePlayer.isInitialized()) {
+            mLakePlayer.stop()
         }
         if (remove_status_icon) {
             isMusicPlaying = false
@@ -135,7 +138,7 @@ class PlaybackManager constructor(
     }
 
     fun getAudioSessionId(): Int {
-        synchronized(this) { return mPlayer.getAudioSessionId() }
+        synchronized(this) { return mLakePlayer.getAudioSessionId() }
     }
 
     /**
@@ -169,12 +172,12 @@ class PlaybackManager constructor(
 
         override fun onStop() {
             MusicLibLog.d(TAG, "onStop")
-            mPlayer.stop()
+            mLakePlayer.stop()
         }
 
         override fun onSeekTo(pos: Long) {
             MusicLibLog.d(TAG, "onSeekTo $pos")
-            mPlayer.seekTo(pos)
+            mLakePlayer.seekTo(pos)
         }
 
         override fun onAddQueueItem(description: MediaDescriptionCompat?) {
@@ -223,7 +226,7 @@ class PlaybackManager constructor(
             mNowPlayingIndex = MediaQueueManager.getNowPlayingIndex()
             mNowPlayingMusic = MediaQueueManager.getNowPlayingMusic()
             musicPlayEventListener?.onMetaChanged(mNowPlayingMusic)
-            mPlayer.setMusicInfo(mNowPlayingMusic)
+            mLakePlayer.setMusicInfo(mNowPlayingMusic)
 
             isMusicPlaying = false
 
@@ -231,12 +234,12 @@ class PlaybackManager constructor(
                 checkPlayOnValid()
             } else {
                 playErrorTimes = 0
-                mPlayer.playWhenReady = playWhenReady
-                mPlayer.setDataSource(mNowPlayingMusic?.uri)
+                mLakePlayer.playWhenReady = playWhenReady
+                mLakePlayer.setDataSource(mNowPlayingMusic?.uri)
             }
             mHistoryPos.add(mNowPlayingIndex)
 
-            if (mPlayer.isInitialized()) {
+            if (mLakePlayer.isInitialized()) {
                 mHandler.removeMessages(MusicPlayerService.VOLUME_FADE_DOWN)
                 mHandler.sendEmptyMessage(MusicPlayerService.VOLUME_FADE_UP) //组件调到正常音量
             }

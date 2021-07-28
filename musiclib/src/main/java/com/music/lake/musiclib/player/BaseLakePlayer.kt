@@ -3,11 +3,16 @@ package com.music.lake.musiclib.player
 import com.music.lake.musiclib.bean.BaseMusicInfo
 import com.music.lake.musiclib.playback.PlaybackListener
 
-open class BasePlayer {
+/**
+ * 播放基类，抽离ExoPlayer、MusicPlayer公共方法
+ */
+open class BaseLakePlayer {
     @JvmField
     var mNowPlayingMusic: BaseMusicInfo? = null
+
     @JvmField
     var listener: PlaybackListener? = null
+
     @JvmField
     var playWhenReady = true
 
@@ -15,6 +20,7 @@ open class BasePlayer {
     open fun release() {}
     open fun start() {}
     open fun pause() {}
+    open fun play() {}
     open fun isPlaying(): Boolean {
         return false
     }

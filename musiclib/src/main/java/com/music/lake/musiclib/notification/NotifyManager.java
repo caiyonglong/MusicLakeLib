@@ -15,7 +15,7 @@ import androidx.media.session.MediaButtonReceiver;
 
 import com.music.lake.musiclib.R;
 import com.music.lake.musiclib.manager.MediaQueueManager;
-import com.music.lake.musiclib.player.BasePlayer;
+import com.music.lake.musiclib.player.BaseLakePlayer;
 import com.music.lake.musiclib.utils.MusicLibLog;
 
 /**
@@ -50,7 +50,7 @@ public class NotifyManager {
 
     private Service mService;
     private Context mContext;
-    private BasePlayer basePlayerImpl;
+    private BaseLakePlayer baseLakePlayerImpl;
 
     public NotifyManager(Service service) {
         this.mService = service;
@@ -66,24 +66,27 @@ public class NotifyManager {
     }
 
     private NotificationCompat.Builder createNotification() {
-
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, initChannelId())
                 .setOngoing(true)
                 .setSmallIcon(R.drawable.ic_music)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setContentIntent(retrievePlaybackAction(ACTION_MUSIC_NOTIFY))
-                .setContentTitle(basePlayerImpl.getTitle())
-                .setContentText(basePlayerImpl.getArtistName())
+                .setContentTitle(baseLakePlayerImpl.getTitle())
+                .setContentText(baseLakePlayerImpl.getArtistName())
                 .setWhen(mNotificationPostTime)
                 .addAction(R.drawable.ic_skip_previous,
                         "",
-                        retrievePlaybackAction(ACTION_PREV))
-                .addAction(R.drawable.ic_play, "",
-                        retrievePlaybackAction(ACTION_PLAY_PAUSE))
-                .addAction(R.drawable.ic_skip_next,
-                        "",
-                        retrievePlaybackAction(ACTION_NEXT))
+                        retrievePlaybackAction(ACTION_PREV));
+        if (baseLakePlayerImpl.isPlaying()) {
+            builder.addAction(R.drawable.ic_pause, "",
+                    retrievePlaybackAction(ACTION_PLAY_PAUSE));
+        } else {
+            builder.addAction(R.drawable.ic_play, "",
+                    retrievePlaybackAction(ACTION_PLAY_PAUSE));
+        }
+        builder.addAction(R.drawable.ic_skip_next,
+                "",
+                retrievePlaybackAction(ACTION_NEXT))
                 .addAction(R.drawable.ic_lyric,
                         "",
                         retrievePlaybackAction(ACTION_LYRIC))
@@ -100,7 +103,7 @@ public class NotifyManager {
     }
 
     public void setupNotification() {
-        if (basePlayerImpl == null) return;
+        if (baseLakePlayerImpl == null) return;
         mNotificationManager = (NotificationManager) mService.getSystemService(mService.NOTIFICATION_SERVICE);
         if (mNotificationPostTime == 0) {
             mNotificationPostTime = System.currentTimeMillis();
@@ -113,17 +116,22 @@ public class NotifyManager {
         MusicLibLog.d(TAG, "updateNotification() isChange：" + isChange + "， isPlaying = [" + isPlaying + "]");
         if (mNotificationBuilder == null) return;
         if (isChange) {
-            basePlayerImpl.mNowPlayingMusic = MediaQueueManager.INSTANCE.getNowPlayingMusic();
-            MusicLibLog.d(TAG, "updateNotification() getTitle：" + basePlayerImpl.getTitle()
-                    + "， getArtistName = " + basePlayerImpl.getArtistName());
+            baseLakePlayerImpl.mNowPlayingMusic = MediaQueueManager.INSTANCE.getNowPlayingMusic();
+            MusicLibLog.d(TAG, "updateNotification() getTitle：" + baseLakePlayerImpl.getTitle()
+                    + "， getArtistName = " + baseLakePlayerImpl.getArtistName());
             if (bitmap != null) {
                 mNotificationBuilder.setLargeIcon(bitmap);
             }
-            mNotificationBuilder.setContentTitle(basePlayerImpl.getTitle());
-            mNotificationBuilder.setContentText(basePlayerImpl.getArtistName());
-            mNotification.tickerText = basePlayerImpl.getTitle() + "-" + basePlayerImpl.getArtistName();
+            mNotificationBuilder.setContentTitle(baseLakePlayerImpl.getTitle());
+            mNotificationBuilder.setContentText(baseLakePlayerImpl.getArtistName());
+            mNotificationBuilder.setTicker(baseLakePlayerImpl.getTitle() + "-" + baseLakePlayerImpl.getArtistName());
         }
-        mNotification.actions[1].icon = isPlaying ? R.drawable.ic_pause : R.drawable.ic_play;
+        if (isPlaying)
+            mNotificationBuilder.mActions.set(1, new NotificationCompat.Action(R.drawable.ic_pause, "",
+                    retrievePlaybackAction(ACTION_PLAY_PAUSE)));
+        else
+            mNotificationBuilder.mActions.set(1, new NotificationCompat.Action(R.drawable.ic_play, "",
+                    retrievePlaybackAction(ACTION_PLAY_PAUSE)));
         mNotification = mNotificationBuilder.build();
         //前台服务
         mService.startForeground(NOTIFICATION_ID, mNotification);
@@ -165,8 +173,8 @@ public class NotifyManager {
         return id;
     }
 
-    public void setBasePlayerImpl(BasePlayer basePlayerImpl) {
-        this.basePlayerImpl = basePlayerImpl;
+    public void setBasePlayerImpl(BaseLakePlayer baseLakePlayerImpl) {
+        this.baseLakePlayerImpl = baseLakePlayerImpl;
     }
 
     public void setShowWhen(boolean showWhen) {

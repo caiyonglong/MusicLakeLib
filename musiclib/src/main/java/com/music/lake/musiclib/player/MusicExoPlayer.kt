@@ -26,7 +26,7 @@ import java.io.IOException
  * Created by cyl on 2018/5/11.
  */
 
-class MusicExoPlayer(var context: Context) : BasePlayer(), Player.EventListener {
+class MusicExoPlayer(var context: Context) : BaseLakePlayer(), Player.EventListener {
 
     private val TAG = "MusicExoPlayer"
 
@@ -182,6 +182,11 @@ class MusicExoPlayer(var context: Context) : BasePlayer(), Player.EventListener 
         exoPlayer?.stop(true)
     }
 
+    override fun play() {
+        super.play()
+        exoPlayer?.playWhenReady = true
+    }
+
     override fun pause() {
         super.pause()
         exoPlayer?.playWhenReady = false
@@ -306,12 +311,16 @@ class MusicExoPlayer(var context: Context) : BasePlayer(), Player.EventListener 
             MusicLibLog.d(TAG, "onPlayerStateChanged ${eventTime.realtimeMs} $playWhenReady $state")
             if (state == Player.STATE_ENDED) {
                 playbackListener?.onCompletionNext()
+            } else if (state == Player.STATE_IDLE) {
+                playbackListener?.onPrepared()
             } else if (state == Player.STATE_READY) {
+                playbackListener?.onPlayerStateChanged(exoPlayer.playWhenReady)
             }
         }
 
         override fun onPlayWhenReadyChanged(eventTime: AnalyticsListener.EventTime, playWhenReady: Boolean, reason: Int) {
             super.onPlayWhenReadyChanged(eventTime, playWhenReady, reason)
+            MusicLibLog.d(TAG, "onPlayWhenReadyChanged ${eventTime.realtimeMs} $playWhenReady")
             playbackListener?.onPlayerStateChanged(playWhenReady)
         }
 

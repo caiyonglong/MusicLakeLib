@@ -15,7 +15,7 @@ import com.music.lake.musiclib.utils.MusicLibLog;
  * Created by D22434 on 2018/1/16.
  */
 
-public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorListener,
+public class MusicMediaPlayer extends BaseLakePlayer implements MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnPreparedListener {
 
     private String TAG = "MusicMediaPlayer";
@@ -123,6 +123,16 @@ public class MusicMediaPlayer extends BasePlayer implements MediaPlayer.OnErrorL
         super.release();
         MusicLibLog.d(TAG, "release");
         mCurrentMediaPlayer.release();
+    }
+
+    @Override
+    public void play() {
+        super.play();
+        MusicLibLog.d(TAG, "play");
+        mCurrentMediaPlayer.start();
+        if (listener != null) {
+            listener.onPlayerStateChanged(isPlaying());
+        }
     }
 
     @Override

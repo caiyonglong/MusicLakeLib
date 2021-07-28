@@ -45,7 +45,7 @@ import com.music.lake.musiclib.manager.PlaybackManager;
 import com.music.lake.musiclib.media.library.BrowseTreeKt;
 import com.music.lake.musiclib.notification.NotifyManager;
 import com.music.lake.musiclib.playback.PlaybackListener;
-import com.music.lake.musiclib.player.BasePlayer;
+import com.music.lake.musiclib.player.BaseLakePlayer;
 import com.music.lake.musiclib.player.MusicExoPlayer;
 import com.music.lake.musiclib.player.MusicMediaPlayer;
 import com.music.lake.musiclib.utils.CommonUtils;
@@ -122,7 +122,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements Pla
     private int playErrorTimes = 0;
     private int MAX_ERROR_TIMES = 1;
 
-    private BasePlayer mPlayer = null;
+    private BaseLakePlayer mPlayer = null;
     public PowerManager.WakeLock mWakeLock;
     private PowerManager powerManager;
     private TimerTask mPlayerTask;
